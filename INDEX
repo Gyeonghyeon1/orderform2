@@ -10,12 +10,8 @@
       padding: 8px;
     }
     input {
-      width: 80px;
+      width: 60px;
       text-align: center;
-    }
-    button {
-      padding: 5px 10px;
-      font-size: 16px;
     }
     #totalSum {
       font-weight: bold;
@@ -37,27 +33,15 @@
     </tr>
   </thead>
   <tbody>
-    <tr data-name="전선">
-      <td>전선</td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td class="subtotal">0</td>
-    </tr>
-    <tr data-name="콘센트">
-      <td>콘센트</td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td><input type="number" value="0" onchange="calculateMatrix()" /></td>
-      <td class="subtotal">0</td>
-    </tr>
+    <!-- JS에서 자동으로 행 생성 -->
   </tbody>
 </table>
 
 <h3>총합: <span id="totalSum">0</span> 원</h3>
 
 <script>
- const unitPrices = {
+// unitPrices 그대로 복붙
+const unitPrices = {
   "1/4 버": 1800,
   "701버": 1800,
   "7404 014 버": 6000,
@@ -172,27 +156,43 @@
   "블랙실크 3-0(유침)_12s": 12000
 };
 
-  function calculateMatrix() {
-    let total = 0;
-    const rows = document.querySelectorAll("#matrix tbody tr");
+// 테이블 행 생성
+const tbody = document.querySelector("#matrix tbody");
 
-    rows.forEach(row => {
-      const itemName = row.dataset.name;
-      const unitPrice = unitPrices[itemName];
-      let rowSum = 0;
+Object.keys(unitPrices).forEach(name => {
+  const tr = document.createElement("tr");
+  tr.dataset.name = name;
+  tr.innerHTML = `
+    <td>${name}</td>
+    <td><input type="number" value="0" onchange="calculateMatrix()"></td>
+    <td><input type="number" value="0" onchange="calculateMatrix()"></td>
+    <td><input type="number" value="0" onchange="calculateMatrix()"></td>
+    <td class="subtotal">0</td>
+  `;
+  tbody.appendChild(tr);
+});
 
-      const qtyInputs = row.querySelectorAll("input");
-      qtyInputs.forEach(input => {
-        const qty = parseFloat(input.value) || 0;
-        rowSum += qty * unitPrice;
-      });
+function calculateMatrix() {
+  let total = 0;
+  const rows = document.querySelectorAll("#matrix tbody tr");
 
-      row.querySelector(".subtotal").textContent = rowSum.toLocaleString();
-      total += rowSum;
+  rows.forEach(row => {
+    const itemName = row.dataset.name;
+    const unitPrice = unitPrices[itemName];
+    let rowSum = 0;
+
+    const qtyInputs = row.querySelectorAll("input");
+    qtyInputs.forEach(input => {
+      const qty = parseFloat(input.value) || 0;
+      rowSum += qty * unitPrice;
     });
 
-    document.getElementById("totalSum").textContent = total.toLocaleString();
-  }
+    row.querySelector(".subtotal").textContent = rowSum.toLocaleString();
+    total += rowSum;
+  });
+
+  document.getElementById("totalSum").textContent = total.toLocaleString();
+}
 </script>
 
 </body>
